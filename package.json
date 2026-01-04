@@ -1,0 +1,22 @@
+{
+  "name": "i1020",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=apps/backend & npm run dev --workspace=apps/frontend",
+    "build": "npm run build --workspace=apps/backend && npm run build --workspace=apps/frontend",
+    "start": "npm run start --workspace=apps/backend & npm run start --workspace=apps/frontend",
+    "db:up": "docker-compose up -d",
+    "db:down": "docker-compose down",
+    "db:migrate": "npm run db:migrate --workspace=apps/backend",
+    "db:seed": "npm run db:seed --workspace=apps/backend",
+    "db:rollback": "npm run db:rollback --workspace=apps/backend"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
+
