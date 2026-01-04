@@ -37,7 +37,7 @@ export function AuthForm({
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-md border-primary/30 shadow-2xl shadow-primary/20">
         <CardContent className="p-8">
           <div className="flex flex-col gap-6">
