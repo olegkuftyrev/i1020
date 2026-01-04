@@ -124,18 +124,4 @@
     color: inherit;
     text-decoration: none;
   }
-  
-  /* Glow effects */
-  .glow-primary {
-    box-shadow: 0 0 10px hsl(180 100% 50% / 0.4),
-                0 0 20px hsl(180 100% 50% / 0.3),
-                0 0 30px hsl(180 100% 50% / 0.2);
-  }
-  
-  .glow-primary-hover:hover {
-    box-shadow: 0 0 15px hsl(180 100% 50% / 0.6),
-                0 0 30px hsl(180 100% 50% / 0.4),
-                0 0 45px hsl(180 100% 50% / 0.3);
-    transition: box-shadow 0.3s ease;
-  }
 }

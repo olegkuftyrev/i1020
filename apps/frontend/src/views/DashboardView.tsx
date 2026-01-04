@@ -2,13 +2,15 @@
 
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import { useAuthStore } from "@/src/stores/authStore"
 import { authApi } from "@/src/lib/api"
 import { DashboardContent } from "@/src/components/DashboardContent"
+import { DashboardNavbar } from "@/src/components/DashboardNavbar"
 
 export function DashboardView() {
   const router = useRouter()
-  const { user, setUser, setLoading, setError, logout: logoutStore } = useAuthStore()
+  const { user, setUser, setLoading, logout: logoutStore } = useAuthStore()
 
   useEffect(() => {
     fetchUser()
@@ -23,7 +25,7 @@ export function DashboardView() {
       if (err.message === "Unauthorized") {
         router.push("/auth")
       } else {
-        setError(err.message || "Failed to load user information")
+        toast.error(err.message || "Failed to load user information")
       }
     } finally {
       setLoading(false)
@@ -40,6 +42,13 @@ export function DashboardView() {
     }
   }
 
-  return <DashboardContent user={user} onLogout={handleLogout} />
+  return (
+    <div className="min-h-screen flex flex-col">
+      <DashboardNavbar />
+      <main className="flex-1">
+        <DashboardContent user={user} onLogout={handleLogout} />
+      </main>
+    </div>
+  )
 }
 

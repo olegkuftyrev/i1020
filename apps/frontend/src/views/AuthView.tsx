@@ -2,34 +2,32 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import { useAuthStore } from "@/src/stores/authStore"
 import { authApi } from "@/src/lib/api"
 import { AuthForm } from "@/src/components/AuthForm"
 
 export function AuthView() {
   const router = useRouter()
-  const { setUser, setLoading, setError } = useAuthStore()
+  const { setUser, setLoading } = useAuthStore()
   const [isLogin, setIsLogin] = useState(true)
-  const [success, setSuccess] = useState("")
 
-  const handleSubmit = async (email: string, password: string, fullName?: string) => {
+  const handleSubmit = async (email: string, password: string, name?: string) => {
     setLoading(true)
-    setError(null)
-    setSuccess("")
 
     try {
       const data = isLogin
         ? await authApi.login({ email, password })
-        : await authApi.register({ email, password, fullName })
+        : await authApi.register({ email, password, name })
 
       setUser(data.user)
-      setSuccess(data.message || "Success!")
+      toast.success(data.message || (isLogin ? "Login successful" : "Account created successfully"))
       
       setTimeout(() => {
         router.push("/dashboard")
       }, 1000)
     } catch (err: any) {
-      setError(err.message || "An error occurred")
+      toast.error(err.message || "An error occurred")
     } finally {
       setLoading(false)
     }
@@ -40,11 +38,8 @@ export function AuthView() {
       isLogin={isLogin}
       onToggleMode={() => {
         setIsLogin(!isLogin)
-        setError(null)
-        setSuccess("")
       }}
       onSubmit={handleSubmit}
-      success={success}
     />
   )
 }

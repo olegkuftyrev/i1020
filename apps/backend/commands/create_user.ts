@@ -16,21 +16,21 @@ export default class CreateUser extends BaseCommand {
   @args.string({ description: 'User password' })
   declare password: string
 
-  @flags.string({ description: 'User full name', flagName: 'full-name' })
-  declare fullName: string
+  @flags.string({ description: 'User name', flagName: 'name' })
+  declare name: string
 
   async run() {
     try {
       const user = await User.create({
         email: this.email,
         password: this.password,
-        fullName: this.fullName || null,
+        name: this.name || null,
       })
 
       this.logger.success('User created successfully!')
       this.logger.info(`ID: ${user.id}`)
       this.logger.info(`Email: ${user.email}`)
-      this.logger.info(`Full Name: ${user.fullName || 'N/A'}`)
+      this.logger.info(`Name: ${user.name || 'N/A'}`)
       this.logger.info(`Password: ${this.password}`)
     } catch (error: any) {
       if (error.code === '23505') {

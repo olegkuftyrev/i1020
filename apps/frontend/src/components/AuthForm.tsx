@@ -8,32 +8,28 @@ import {
   Field,
   FieldDescription,
   FieldGroup,
-  FieldLabel,
-  FieldSeparator,
 } from "@/components/ui/field"
 import { useAuthStore } from "@/src/stores/authStore"
 
 interface AuthFormProps {
   isLogin: boolean
   onToggleMode: () => void
-  onSubmit: (email: string, password: string, fullName?: string) => void
-  success?: string
+  onSubmit: (email: string, password: string, name?: string) => void
 }
 
 export function AuthForm({
   isLogin,
   onToggleMode,
   onSubmit,
-  success,
 }: AuthFormProps) {
-  const { isLoading, error } = useAuthStore()
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [fullName, setFullName] = useState("")
+  const { isLoading } = useAuthStore()
+  const [email, setEmail] = useState("test@example.com")
+  const [password, setPassword] = useState("password123")
+  const [name, setName] = useState("")
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onSubmit(email, password, isLogin ? undefined : fullName)
+    onSubmit(email, password, isLogin ? undefined : name)
   }
 
   return (
@@ -78,8 +74,8 @@ export function AuthForm({
                     <Input
                       type="text"
                       placeholder="Full Name"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
                       required={!isLogin}
                     />
                   </Field>
@@ -102,16 +98,6 @@ export function AuthForm({
                     required
                   />
                 </Field>
-                {error && (
-                  <div className="text-sm text-destructive bg-destructive/10 border border-destructive/20 p-3 rounded-md">
-                    {error}
-                  </div>
-                )}
-                {success && (
-                  <div className="text-sm text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-950/50 border border-green-200 dark:border-green-800 p-3 rounded-md">
-                    {success}
-                  </div>
-                )}
                 <Field>
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading
@@ -121,31 +107,10 @@ export function AuthForm({
                       : "Create account"}
                   </Button>
                 </Field>
-                {isLogin && (
-                  <>
-                    <FieldSeparator>Or</FieldSeparator>
-                    <Field className="grid gap-4 sm:grid-cols-2">
-                      <Button variant="outline" type="button" className="w-full">
-                        Continue with Apple
-                      </Button>
-                      <Button variant="outline" type="button" className="w-full">
-                        Continue with Google
-                      </Button>
-                    </Field>
-                  </>
-                )}
               </FieldGroup>
             </form>
             <FieldDescription className="px-6 text-center">
-              By clicking continue, you agree to our{" "}
-              <a href="#" className="text-primary hover:underline underline-offset-4">
-                Terms of Service
-              </a>{" "}
-              and{" "}
-              <a href="#" className="text-primary hover:underline underline-offset-4">
-                Privacy Policy
-              </a>
-              .
+              personal use only
             </FieldDescription>
           </div>
         </CardContent>

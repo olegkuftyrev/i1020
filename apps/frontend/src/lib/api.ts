@@ -8,13 +8,34 @@ export interface LoginData {
 export interface RegisterData {
   email: string
   password: string
-  fullName?: string
+  name?: string
+}
+
+export interface UserRole {
+  id: number | string
+  name: string
+  slug: string
+}
+
+export interface UserStore {
+  id: number | string
+  storeId: number | string
+  role: 'ASSOCIATE' | 'MANAGER' | 'ADMIN'
+  store?: {
+    id: number | string
+    code: string
+    name: string
+    timezone: string
+    isActive: boolean
+  } | null
 }
 
 export interface User {
-  id: number
+  id: number | string
   email: string
-  fullName: string | null
+  name: string | null
+  roles?: UserRole[]
+  stores?: UserStore[]
 }
 
 export interface AuthResponse {
