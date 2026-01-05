@@ -20,6 +20,12 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column()
   declare email: string
 
+  @column()
+  declare role: 'associate' | 'manager' | 'admin'
+
+  @column()
+  declare theme: 'dark' | 'light' | 'system' | 'iron-man'
+
   @column({ serializeAs: null })
   declare password: string
 

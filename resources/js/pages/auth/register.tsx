@@ -9,6 +9,7 @@ import { type PageProps } from '@/types'
 import { Head, router, useForm } from '@inertiajs/react'
 import { EyeIcon, EyeOffIcon, LoaderCircle } from 'lucide-react'
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 type RegisterForm = {
   name: string
@@ -34,11 +35,26 @@ const RegisterPage = ({ auth, errors }: PageProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
+    const toastId = toast.loading('Creating account...')
+
     post(REGISTRATION_API, {
       onFinish: () => reset('password', 'password_confirmation'),
-      onError: (_errors) => {
-        // show a toast or send error to Sentry or log it to Firebase.
-        // Whatever you prefer
+      onSuccess: () => {
+        toast.success('Account created successfully!', { id: toastId })
+      },
+      onError: (errors) => {
+        const errorMessages: string[] = []
+        if (errors.name) errorMessages.push(`Name: ${errors.name}`)
+        if (errors.email) errorMessages.push(`Email: ${errors.email}`)
+        if (errors.password) errorMessages.push(`Password: ${errors.password}`)
+        if (errors.password_confirmation)
+          errorMessages.push(`Password confirmation: ${errors.password_confirmation}`)
+
+        const errorMessage =
+          errorMessages.length > 0
+            ? errorMessages.join(', ')
+            : 'An error occurred during registration'
+        toast.error(errorMessage, { id: toastId })
       },
     })
   }

@@ -11,6 +11,7 @@ const SessionController = () => import('#controllers/session_controller')
 import router from '@adonisjs/core/services/router'
 import { middleware } from './kernel.js'
 const RegisteredUsersController = () => import('#controllers/registered_users_controller')
+const ProfileController = () => import('#controllers/profile_controller')
 
 // Web routes
 router.on('/').renderInertia('welcome').as('home')
@@ -28,7 +29,12 @@ router
 router
   .group(() => {
     router.on('/settings').redirect('/settings/profile')
-    router.on('/settings/profile').renderInertia('settings/profile').as('settings.profile')
+    router.get('/settings/profile', [ProfileController, 'show']).as('settings.profile')
+    router.put('/settings/profile', [ProfileController, 'update']).as('settings.profile.update')
+    router
+      .put('/settings/password', [ProfileController, 'updatePassword'])
+      .as('settings.password.update')
+    router.put('/settings/theme', [ProfileController, 'updateTheme']).as('settings.theme.update')
     router.on('/settings/security').renderInertia('settings/security').as('settings.security')
     router.on('/settings/appearance').renderInertia('settings/appearance').as('settings.appearance')
   })

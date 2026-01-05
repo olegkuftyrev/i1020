@@ -3,10 +3,13 @@ import { SettingsLayout } from '@/components/layout/settings-layout'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Separator } from '@/components/ui/separator'
+import { THEME_UPDATE_API } from '@/lib/constants'
 import { useTheme, type Theme as ThemeType, Themes } from '@/features/theme/theme-provider'
 import { useIsMobile } from '@/hooks/use-mobile'
-import { type BreadcrumbItem } from '@/types'
+import { type BreadcrumbItem, type PageProps } from '@/types'
+import { usePage, useForm } from '@inertiajs/react'
 import { MoonIcon, PaletteIcon, SparklesIcon, SunIcon } from 'lucide-react'
+import { toast } from 'sonner'
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -16,9 +19,43 @@ const breadcrumbs: BreadcrumbItem[] = [
   },
 ]
 
+type ThemeForm = {
+  theme: 'dark' | 'light' | 'system' | 'iron-man'
+}
+
 const AppearancePage = () => {
   const { theme, setTheme } = useTheme()
+  const { user } = usePage<PageProps>().props
   const isMobile = useIsMobile()
+
+  const { put, processing } = useForm<ThemeForm>({
+    theme: (user?.theme as 'dark' | 'light' | 'system' | 'iron-man') || 'system',
+  })
+
+  const handleThemeChange = (value: string) => {
+    const newTheme = value as ThemeType
+    setTheme(newTheme) // Обновляем локальное состояние сразу
+
+    // Определяем сообщение в зависимости от темы
+    const themeMessages: Record<ThemeType, string> = {
+      'light': 'Light theme selected',
+      'dark': 'Dark theme selected',
+      'system': 'System theme selected',
+      'iron-man': 'Iron Man is on',
+    }
+
+    // Сохраняем в БД
+    put(THEME_UPDATE_API, {
+      data: { theme: newTheme },
+      preserveScroll: true,
+      onSuccess: () => {
+        toast.success(themeMessages[newTheme])
+      },
+      onError: () => {
+        toast.error('Failed to update theme')
+      },
+    })
+  }
 
   return (
     <PageLayout breadcrumbs={breadcrumbs} pageTitle="Appearance settings">
@@ -36,9 +73,10 @@ const AppearancePage = () => {
             </div>
             <div className="md:col-span-2">
               <RadioGroup
-                defaultValue={theme}
+                value={theme}
                 className="grid grid-cols-3 gap-4"
-                onValueChange={(value) => setTheme(value as ThemeType)}
+                onValueChange={handleThemeChange}
+                disabled={processing}
               >
                 <div className="flex cursor-pointer items-center space-x-2 rounded-lg border p-3 hover:bg-accent">
                   <RadioGroupItem value={Themes.light} id={Themes.light} />

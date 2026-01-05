@@ -11,12 +11,6 @@ const tabOptions: NavItem[] = [
     type: 'internal',
   },
   {
-    title: 'Security',
-    href: '/settings/security',
-    icon: null,
-    type: 'internal',
-  },
-  {
     title: 'Appearance',
     href: '/settings/appearance',
     icon: null,
@@ -46,7 +40,7 @@ export const SettingsLayout = ({ children }: PropsWithChildren) => {
           router.visit(value)
         }}
       >
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           {tabOptions.map((tab) => (
             <TabsTrigger
               key={tab.title.toLowerCase()}

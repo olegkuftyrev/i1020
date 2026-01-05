@@ -2,6 +2,8 @@ export interface User {
   id: number
   name: string | null
   email: string
+  role?: 'associate' | 'manager' | 'admin'
+  theme?: 'dark' | 'light' | 'system' | 'iron-man'
 }
 
 export interface AuthData {

@@ -38,6 +38,7 @@ export function ThemeProvider({
     if (typeof window === 'undefined') {
       return defaultTheme
     }
+    // Используем localStorage или defaultTheme
     return (localStorage.getItem(storageKey) as Theme) || defaultTheme
   })
 

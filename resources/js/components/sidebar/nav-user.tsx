@@ -89,7 +89,7 @@ export const NavUser = () => {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link className="block w-full" href="settings" as="button" onClick={handleLogout}>
+              <Link className="block w-full" href="/settings/profile" as="button">
                 <SettingsIcon className="mr-2" />
                 Settings
               </Link>

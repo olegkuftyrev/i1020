@@ -1,12 +1,16 @@
-import { useTheme } from 'next-themes'
+import { useTheme } from '@/features/theme/theme-provider'
 import { Toaster as Sonner, type ToasterProps } from 'sonner'
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  const { theme = 'system' } = useTheme()
+  const { theme } = useTheme()
+
+  // Преобразуем тему в формат sonner (dark/light)
+  const sonnerTheme =
+    theme === 'dark' || theme === 'iron-man' ? 'dark' : theme === 'light' ? 'light' : 'system'
 
   return (
     <Sonner
-      theme={theme as ToasterProps['theme']}
+      theme={sonnerTheme as ToasterProps['theme']}
       className="toaster group"
       style={
         {

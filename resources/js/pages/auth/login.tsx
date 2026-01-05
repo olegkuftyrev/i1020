@@ -12,6 +12,7 @@ import { type PageProps } from '@/types/inertia'
 import { Head, router, useForm } from '@inertiajs/react'
 import { EyeIcon, EyeOffIcon, LoaderCircle } from 'lucide-react'
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 type LoginForm = {
   email: string
@@ -37,12 +38,17 @@ const LoginPage = ({ status, canResetPassword, auth, flash }: LoginProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
+    const toastId = toast.loading('Signing in...')
+
     // Direct Inertia form submission
     post(LOGIN_API, {
       onFinish: () => reset('password'),
-      onError: (_errors) => {
-        // show a toast or send error to Sentry or log it to Firebase.
-        // whatever you prefer
+      onSuccess: () => {
+        toast.success('Successfully signed in!', { id: toastId })
+      },
+      onError: (errors) => {
+        const errorMessage = errors.email || errors.password || 'Invalid email or password'
+        toast.error(`Login error: ${errorMessage}`, { id: toastId })
       },
     })
   }

@@ -35,6 +35,8 @@ declare module '@adonisjs/inertia/types' {
       id: number
       name: string | null
       email: string
+      role?: 'associate' | 'manager' | 'admin'
+      theme?: 'dark' | 'light' | 'system' | 'iron-man'
     } | null
     flash: {
       success?: string

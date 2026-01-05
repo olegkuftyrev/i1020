@@ -17,6 +17,8 @@ export default class InertiaMiddleware {
               id: ctx.auth.user.id,
               name: ctx.auth.user.name,
               email: ctx.auth.user.email,
+              role: ctx.auth.user.role,
+              theme: ctx.auth.user.theme,
             }
           : null,
 
@@ -25,9 +27,9 @@ export default class InertiaMiddleware {
         success: ctx.session.flashMessages.get('success'),
         errors: ctx.session.flashMessages.get('errors'),
       }),
-    })
 
-    sidebarOpen: true
+      sidebarOpen: true,
+    })
 
     /**
      * Call next method in the pipeline and return its output

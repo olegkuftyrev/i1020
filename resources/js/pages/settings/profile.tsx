@@ -1,11 +1,21 @@
 import { PageLayout } from '@/components/layout/page-layout'
 import { SettingsLayout } from '@/components/layout/settings-layout'
-import { Button } from '@/components/ui/button'
+import { InputError } from '@/components/common/input-error'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Separator } from '@/components/ui/separator'
-import { Textarea } from '@/components/ui/textarea'
-import { type BreadcrumbItem } from '@/types'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { PROFILE_UPDATE_API } from '@/lib/constants'
+import { type BreadcrumbItem, type PageProps, type ValidationErrors } from '@/types'
+import { usePage, useForm } from '@inertiajs/react'
+import { useEffect, useRef } from 'react'
+import { Lock } from 'lucide-react'
+import { toast } from 'sonner'
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -15,7 +25,65 @@ const breadcrumbs: BreadcrumbItem[] = [
   },
 ]
 
+type ProfileForm = {
+  name: string
+  email: string
+  role: 'associate' | 'manager' | 'admin'
+}
+
 const ProfilePage = () => {
+  const { user, flash } = usePage<PageProps>().props
+  const { errors } = (flash || {}) as { errors: ValidationErrors }
+
+  const { data, setData, put, processing } = useForm<ProfileForm>({
+    name: user?.name || '',
+    email: user?.email || '',
+    role: (user?.role as 'associate' | 'manager' | 'admin') || 'associate',
+  })
+
+  const nameFieldRef = useRef<{ lastSavedValue: string }>({ lastSavedValue: user?.name || '' })
+  const emailFieldRef = useRef<{ lastSavedValue: string }>({ lastSavedValue: user?.email || '' })
+
+  // Обновляем refs при изменении user из props
+  useEffect(() => {
+    if (user?.name) {
+      nameFieldRef.current.lastSavedValue = user.name
+    }
+    if (user?.email) {
+      emailFieldRef.current.lastSavedValue = user.email
+    }
+  }, [user])
+
+  const handleBlur = (field: 'name' | 'email') => {
+    const currentValue = data[field]
+    const lastSavedValue =
+      field === 'name' ? nameFieldRef.current.lastSavedValue : emailFieldRef.current.lastSavedValue
+
+    // Сохраняем только если значение изменилось
+    if (currentValue !== lastSavedValue && currentValue.trim() !== '') {
+      const fieldName = field === 'name' ? 'Name' : 'Email'
+      const toastId = toast.loading(`Updating ${fieldName.toLowerCase()}...`)
+
+      put(PROFILE_UPDATE_API, {
+        preserveScroll: true,
+        onSuccess: () => {
+          // Обновляем последнее сохраненное значение
+          if (field === 'name') {
+            nameFieldRef.current.lastSavedValue = currentValue
+          } else {
+            emailFieldRef.current.lastSavedValue = currentValue
+          }
+          toast.success(`${fieldName} updated successfully`, { id: toastId })
+        },
+        onError: (errors) => {
+          // Errors are handled by flash messages
+          const errorMessage = errors[field] || 'An error occurred while updating'
+          toast.error(`${fieldName}: ${errorMessage}`, { id: toastId })
+        },
+      })
+    }
+  }
+
   return (
     <PageLayout breadcrumbs={breadcrumbs} pageTitle="Profile settings">
       <SettingsLayout>
@@ -26,56 +94,61 @@ const ProfilePage = () => {
               <p className="text-sm text-muted-foreground">Set your account details</p>
             </div>
             <div className="md:col-span-2">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="name" className="text-xs text-muted-foreground">
                     Full Name
                   </Label>
-                  <Input id="name" placeholder="John Doe" />
+                  <Input
+                    id="name"
+                    placeholder="John Doe"
+                    value={data.name}
+                    onChange={(e) => setData('name', e.target.value)}
+                    onBlur={() => handleBlur('name')}
+                    disabled={processing}
+                  />
+                  <InputError message={errors?.name} />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-xs text-muted-foreground">
+                  <Label
+                    htmlFor="email"
+                    className="text-xs text-muted-foreground flex items-center gap-1.5"
+                  >
+                    <Lock className="h-3 w-3" />
                     Email address
                   </Label>
-                  <Input type={'email'} id="email" placeholder="user@email.com" />
+                  <Input
+                    type="email"
+                    id="email"
+                    placeholder="user@email.com"
+                    value={data.email}
+                    disabled={true}
+                    readOnly
+                  />
+                  <InputError message={errors?.email} />
+                </div>
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="role"
+                    className="text-xs text-muted-foreground flex items-center gap-1.5"
+                  >
+                    <Lock className="h-3 w-3" />
+                    Role
+                  </Label>
+                  <Select value={data.role} disabled={true}>
+                    <SelectTrigger id="role" className="w-full">
+                      <SelectValue placeholder="Select role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="associate">Associate</SelectItem>
+                      <SelectItem value="manager">Manager</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <InputError message={errors?.role} />
                 </div>
               </div>
             </div>
-          </div>
-
-          <Separator />
-
-          {/* Bio */}
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-            <div className="space-y-1">
-              <Label className="text-sm font-medium">Bio</Label>
-              <p className="text-sm text-muted-foreground">
-                Brief description for your profile. Max 160 characters.
-              </p>
-            </div>
-            <div className="md:col-span-2">
-              <Textarea
-                placeholder="Tell us about yourself..."
-                className="min-h-[100px] resize-none"
-              />
-            </div>
-          </div>
-
-          <Separator />
-
-          {/* Location */}
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-            <div className="space-y-1">
-              <Label className="text-sm font-medium">Location</Label>
-              <p className="text-sm text-muted-foreground">Your current location.</p>
-            </div>
-            <div className="md:col-span-2">
-              <Input placeholder="San Francisco, CA" />
-            </div>
-          </div>
-
-          <div className="flex justify-end border-t pt-6">
-            <Button>Save Changes</Button>
           </div>
         </section>
       </SettingsLayout>
